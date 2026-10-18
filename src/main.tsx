@@ -5,7 +5,6 @@ import {chapters,displayNames,fights,type Character,type Step,type Scene,type Ch
 import './style.css'
 
 type Phase = 'title'|'story'|'choice'|'attack'|'final'
-type Attack = 'boss1'|'boss2'|'boss3'|'proposal'|'marriage'
 const asset = (name:Character, mood?:string) => {
  if(name==='friend') return '/assets/friend.webp'
  if(name==='amanda') return '/assets/amanda.webp'
@@ -27,7 +26,7 @@ function App(){
  const [index,setIndex]=useState(0)
  const [queue,setQueue]=useState<Step[]>([])
  const [qIndex,setQIndex]=useState(0)
- const [active,setActive]=useState<Attack|null>(null)
+ const [active,setActive]=useState<Step['action'] | null>(null)
  const [sound,setSound]=useState(false)
  const [visible,setVisible]=useState(0)
  const [hit,setHit]=useState(false)
@@ -40,7 +39,7 @@ function App(){
  const left:Character='vendela'
  // Reveal each character only when the story actually introduces them.
  // During attack sequences keep the boss visible until the FATALITY, then hide them.
- const inFight = phase==='choice' || (phase==='attack' && active!==null && active in fights)
+ const inFight = phase==='choice' || (phase==='attack' && active != null && active in fights)
  const isEpilogue = phase==='attack' && active===null
  const attackReachedFatality = phase==='attack' && queue.slice(0,qIndex+1).some(s=>s.special==='fatality')
  // Once the kick launches him, the Fuckboy stays off-screen for the rest of the attack.
@@ -64,7 +63,7 @@ function App(){
   if(!active)return []
   if(active in fights)return fights[active as keyof typeof fights].choices
   if(active==='proposal')return ['YES','ABSOLUTELY','CHA CHA CHA'].map(label=>({label,steps:[{text:'WEDDING UNLOCKED!',special:'wedding'}]}))
-  return ['YES','OBVIOUSLY','ICH KOMME!'].map(label=>({label,steps:[{text:'THROUPLE ENDING UNLOCKED!',special:'ending'}]}))
+  return ['YES','OBVIOUSLY','ICH KOMME!'].map(label=>({label,steps:[{text:'THROUPLE ENDING UNLOCKED!',special:'ending' as const}]}))
  },[active])
  const beep=(freq=420,duration=.055)=>{
   if(!sound)return
